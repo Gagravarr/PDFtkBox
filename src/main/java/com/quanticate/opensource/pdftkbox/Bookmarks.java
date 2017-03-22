@@ -23,6 +23,9 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.action.PDAction;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageFitDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineNode;
@@ -31,6 +34,13 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlin
  * Helper for using Apache PDFBox to fetch / set bookmarks
  */
 public class Bookmarks implements Closeable {
+   public static final String BookmarkBegin = "BookmarkBegin";
+   public static final String BookmarkTitle = "BookmarkTitle";
+   public static final String BookmarkLevel = "BookmarkLevel";
+   public static final String BookmarkPageNumber = "BookmarkPageNumber";
+   public static final String BookmarkZoom = "BookmarkZoom";
+   public static final String BookmarkYOffset = "BookmarkYOffset";
+   
    private PDDocument document;
    public Bookmarks(File pdf) throws IOException {
       document = PDDocument.load(pdf);
@@ -65,6 +75,31 @@ public class Bookmarks implements Closeable {
          }
          
          if (dest != null) {
+            bm.append(BookmarkBegin).append(System.lineSeparator());
+            bm.append(BookmarkTitle).append(": ")
+               .append(current.getTitle()).append(System.lineSeparator());
+            bm.append(BookmarkLevel).append(": ")
+               .append(level).append(System.lineSeparator());
+            
+            if (dest instanceof PDPageDestination) {
+               PDPageDestination pdest = (PDPageDestination)dest;
+               int pageNum = pdest.retrievePageNumber();
+               if (pageNum != -1) {
+                  bm.append(BookmarkPageNumber).append(": ")
+                     .append(pageNum+1).append(System.lineSeparator());
+               } else {
+                  System.err.println("Error - " + pdest);
+               }
+            }
+            
+            // TODO
+            if (dest instanceof PDPageXYZDestination) {
+               
+            }
+            else if (dest instanceof PDPageFitDestination) {
+               // etc
+            }
+            
             System.err.println("TODO: " + dest);
          }
          
