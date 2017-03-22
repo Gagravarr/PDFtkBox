@@ -13,4 +13,20 @@ dependencies {
     compile   group: 'commons-cli', name: 'commons-cli', version: '1.4'
 }
 
-// TODO shadowJar
+// Build an all-in-one jar
+shadowJar {
+    def program = 'PDFtkBox'
+    manifest {
+      attributes 'Implementation-Title': 'PDFtkBox',
+                 'Main-Class': 'com.quanticate.opensource.pdftkbox.'+program
+    }
+    classifier = ''
+    baseName = program
+    // Report what we built
+    doLast {
+       println " - Generated all-in-one jar ${program}.jar"
+    }
+}
+
+// Default is to build the all-in-one jar
+defaultTasks 'shadowJar'
