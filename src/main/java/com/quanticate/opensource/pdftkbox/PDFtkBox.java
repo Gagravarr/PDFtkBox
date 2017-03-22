@@ -15,13 +15,44 @@
 ==================================================================== */
 package com.quanticate.opensource.pdftkbox;
 
+import java.io.File;
+
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 /**
  * PDFtk bookmark replacement, powered by Apache PDFBox
  */
 public class PDFtkBox {
-   public static void main(String args) {
+   public static void main(String[] args) throws Exception {
       Options options = new Options();
+      
+      // TODO Different options for different use-cases
+      
+      options.addOption(new Option("help", "print this message"));
+      options.addOption(
+            Option.builder("import")
+            .hasArg()
+            .numberOfArgs(2)
+            .desc("import bookmarks from odf" )
+            .argName("pdf").build()
+      );
+      options.addOption(
+            Option.builder("export")
+            .hasArg()
+            .desc("export bookmarks from pdf" )
+            .argName("pdf").build()
+      );
+      
+      HelpFormatter formatter = new HelpFormatter();
+      formatter.printHelp( "PDFtkBox", options );
+      
+      // TODO Do this properly
+      if (args.length >= 2) {
+         Bookmarks bm = new Bookmarks(new File(args[1]));
+         System.out.println(bm.getBookmarks());
+         bm.close();
+      }
    }
 }
