@@ -27,6 +27,12 @@ shadowJar {
        println " - Generated all-in-one jar ${program}.jar"
     }
 }
+// If not using the all-in-one, this is a bundle of dependencies
+task zipDependencies(dependsOn: 'compileJava', type: Zip) {
+    from configurations.compile.allArtifacts.files
+    from configurations.compile
+    archiveName project.name + "-dependencies.zip"
+}
 
 // Default is to build the all-in-one jar
 defaultTasks 'shadowJar'

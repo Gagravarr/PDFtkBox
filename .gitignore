@@ -9,6 +9,8 @@ build/
 
 # Editor files
 .*.swp
+.classpath
+.project
 
 # Package Files #
 *.jar

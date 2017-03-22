@@ -15,5 +15,13 @@
 ==================================================================== */
 package com.quanticate.opensource.pdftkbox;
 
+import org.apache.commons.cli.Options;
+
+/**
+ * PDFtk bookmark replacement, powered by Apache PDFBox
+ */
 public class PDFtkBox {
+   public static void main(String args) {
+      Options options = new Options();
+   }
 }
