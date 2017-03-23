@@ -71,7 +71,30 @@ public class PDFtkBox {
             .argName("bookmarks").build();
       optsNormal.addOption(optBookmarks);
       
-      // TODO PDFtk style options
+      // PDFtk style options
+      Options optsPDFtk = new Options();
+      OptionGroup pdftk = new OptionGroup();
+      Option optDumpData =
+            Option.builder("dump_data")
+            .required()
+            .hasArg()
+            .desc("dump bookmarks from pdf" )
+            .argName("pdf").build();
+      pdftk.addOption(optDumpData);
+      Option optUpdateInfo = 
+            Option.builder("update_info")
+            .required()
+            .hasArg()
+            .desc("update bookmarks in pdf" )
+            .argName("pdf").build();
+      pdftk.addOption(optUpdateInfo);
+      optsPDFtk.addOptionGroup(pdftk);
+      Option optOutput = 
+            Option.builder("output")
+            .hasArg()
+            .desc("output to file" )
+            .argName("file").build();
+      optsPDFtk.addOption(optOutput);
 
       
       // What are we doing?
@@ -82,7 +105,7 @@ public class PDFtkBox {
          parser.parse(optsHelp, args);
          
          // If we get here, they asked for help
-         doPrintHelp(optsHelp, optsNormal);
+         doPrintHelp(optsHelp, optsNormal, optsPDFtk);
          return;
       } catch (ParseException pe) {}
       
@@ -106,13 +129,15 @@ public class PDFtkBox {
       
       // TODO PDFtk style options
       
-      doPrintHelp(optsHelp, optsNormal);
+      doPrintHelp(optsHelp, optsNormal, optsPDFtk);
    }
    
-   protected static void doPrintHelp(Options optsHelp, Options optsNormal) {
+   protected static void doPrintHelp(Options optsHelp, Options optsNormal, Options optsPDFtk) {
       // TODO More helpful help
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp("PDFtkBox", optsNormal);
+      // TODO Nobble output for pdftk
+      formatter.printHelp("PDFtkBox", optsPDFtk);
       formatter.printHelp("PDFtkBox", optsHelp);
    }
    
