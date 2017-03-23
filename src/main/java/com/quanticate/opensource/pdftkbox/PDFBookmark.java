@@ -30,8 +30,6 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlin
 /**
  * Wrapper around PDFBox bookmarks to provide (just) the
  *  information we need
- * 
- * TODO Create support
  */
 public class PDFBookmark {
    public enum ZoomType {

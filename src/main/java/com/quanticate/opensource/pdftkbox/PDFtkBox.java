@@ -97,7 +97,7 @@ public class PDFtkBox {
             return;
          }
          if (line.hasOption(optImport.getOpt()) && line.getArgs().length > 0) {
-            doImport( line.getOptionValue(optExport.getOpt()), 
+            doImport( line.getOptionValue(optImport.getOpt()),
                       line.getOptionValue(optBookmarks.getOpt()), 
                       line.getArgs() );
             return;

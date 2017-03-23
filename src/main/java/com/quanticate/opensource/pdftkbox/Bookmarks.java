@@ -41,6 +41,13 @@ public class Bookmarks implements Closeable {
    public static final String BookmarkZoom    = "BookmarkZoom";
    public static final String BookmarkYOffset = "BookmarkYOffset";
    
+   // For matching
+   private static final String _BMTitle   = BookmarkTitle.toLowerCase() + ":";
+   private static final String _BMLevel   = BookmarkLevel.toLowerCase() + ":";
+   private static final String _BMPageNumber = BookmarkPageNumber.toLowerCase() + ":";
+   private static final String _BMZoom    = BookmarkZoom.toLowerCase() + ":";
+   private static final String _BMYOffset = BookmarkYOffset.toLowerCase() + ":";
+   
    private PDDocument document;
    public Bookmarks(File pdf) throws IOException {
       document = PDDocument.load(pdf);
@@ -93,7 +100,7 @@ public class Bookmarks implements Closeable {
    public void importBookmarks(BufferedReader bookmarkText, File output) throws IOException {
       // Process the wanted bookmarks text
       // TODO
-      List<PDFBookmark> bookmarks = parseBookmarks("TODO");
+      List<PDFBookmark> bookmarks = parseBookmarks(bookmarkText);
       
       // Prepare for the new bookmarks
       PDDocumentOutline outline =  new PDDocumentOutline();
@@ -109,14 +116,36 @@ public class Bookmarks implements Closeable {
     * Parses a list of PDFtk-like Bookmark text into our 
     *  wrapper objects
     */
-   public List<PDFBookmark> parseBookmarks(String bookmarkText) {
+   public List<PDFBookmark> parseBookmarks(BufferedReader bookmarkText) throws IOException {
       List<PDFBookmark> bookmarks = new ArrayList<>();
       
-      for (String bm : bookmarkText.split(BookmarkBegin)) {
-         if (bm.trim().isEmpty()) continue;
-         
-         // TODO
-         System.err.println("TODO: " + bm);
+      String title = null, zoom = null;
+      int level, pageNumber, yOffset;
+      
+      boolean going = true;
+      while (going) {
+         String line = bookmarkText.readLine();
+         if (line == null) going = false;
+         if (line == null || line.equalsIgnoreCase(BookmarkBegin)) {
+            // TODO Create a bookmark if we can
+         } else {
+            String ll = line.toLowerCase();
+            int splitAt = ll.indexOf(':');
+            if (splitAt > 9) {
+               String val = line.substring(splitAt+1).trim();
+               
+               if (ll.startsWith(_BMTitle))
+                  title = val;
+               if (ll.startsWith(_BMLevel))
+                  level = Integer.parseInt(val);
+               if (ll.startsWith(_BMPageNumber))
+                  pageNumber = Integer.parseInt(val);
+               if (ll.startsWith(_BMZoom))
+                  zoom = val;
+               if (ll.startsWith(_BMYOffset))
+                  yOffset = Integer.parseInt(val);
+            }
+         }
       }
       
       return bookmarks;
