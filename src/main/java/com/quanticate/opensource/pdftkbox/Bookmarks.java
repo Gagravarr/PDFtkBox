@@ -156,18 +156,46 @@ public class Bookmarks implements Closeable {
    }
 
    /** Recursive descent import */
-   protected boolean importAllBookmarks(List<PDFBookmark> bookmarks, PDDocumentOutline outline) {
+   protected boolean importAllBookmarks(List<PDFBookmark> bookmarks, PDOutlineNode outline) {
       if (bookmarks.isEmpty()) {
          System.err.println("Error - no bookmarks found to import");
          return false;
       }
-      if (bookmarks.get(0).getLevel() != 0) {
-         System.err.println("Error - first bookmark must start at level 1");
+      
+      PDFBookmark first = bookmarks.get(0);
+      if (first.getLevel() != 1) {
+         System.err.println("Error - first bookmark must start at level 1, not " + first.getLevel());
          return false;
       }
       
-      // TODO Import
-      return false;
+      int pos = 0;
+      while (pos < bookmarks.size()) {
+         pos += importBookmark(pos, bookmarks, 1, outline);
+      }
+      
+      return true;
+   }
+   protected int importBookmark(int pos, List<PDFBookmark> bookmarks, int level, PDOutlineNode outline) {
+      PDFBookmark bookmark = bookmarks.get(pos);
+      PDOutlineItem asOutline = bookmark.createOutline();
+      outline.addLast(asOutline);
+      
+      // Have we run out of bookmarks?
+      if (pos == bookmarks.size()-1) return 1;
+      
+      // Any children to progress?
+      PDFBookmark next = bookmarks.get(pos+1);
+      int nextLevel = next.getLevel();
+      if (nextLevel >= level) {
+         // Sibling
+         return 1 + importBookmark(pos+1, bookmarks, nextLevel, outline);
+      } else if (nextLevel >= level) {
+         // Child
+         return 1 + importBookmark(pos+1, bookmarks, nextLevel, asOutline);
+      } else {
+         // Sibling of a parent - back out to process
+         return 1;
+      }
    }
    
    
