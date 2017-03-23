@@ -17,6 +17,7 @@ package com.quanticate.opensource.pdftkbox;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -97,7 +98,7 @@ public class PDFtkBox {
          }
       } catch (ParseException pe) {}
 
-      // TODO Rest
+      // TODO PDFtk style options
       
       doPrintHelp(optsHelp, optsNormal);
    }
@@ -110,12 +111,16 @@ public class PDFtkBox {
    
    protected static void doExport(String pdf, String[] args) throws IOException {
       Bookmarks bm = new Bookmarks(new File(pdf));
+      
+      PrintWriter output;
       if (args.length == 0) {
-         System.out.println(bm.getBookmarks());
+         output = new PrintWriter(System.out);
       } else {
-         // TODO Write to the file
-         System.err.println("TODO - Write to " + args[0]);
+         output = new PrintWriter(new File(args[0]), "UTF-8");
       }
+      
+      bm.exportBookmarks(output);
+      output.close();
       bm.close();
    }
    protected static void doImport(String pdf, String bookmarks, String[] args) {

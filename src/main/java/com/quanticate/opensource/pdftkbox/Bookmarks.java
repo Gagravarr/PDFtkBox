@@ -18,6 +18,7 @@ package com.quanticate.opensource.pdftkbox;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,42 +49,40 @@ public class Bookmarks implements Closeable {
     * Returns the Bookmarks of a PDF, in PDFtk-like format, or
     *  null if none are contained in the file
     */
-   public String getBookmarks() throws IOException {
+   public void exportBookmarks(PrintWriter output) throws IOException {
       PDDocumentOutline outline =  document.getDocumentCatalog().getDocumentOutline();
-      if (outline == null) return null;
+      if (outline == null) return;
       
-      StringBuilder bm = new StringBuilder();
-      exportBookmark(outline, 1, bm);
-      return bm.toString();
+      exportBookmark(outline, 1, output);
    }
-   protected void exportBookmark(PDOutlineNode outline, int level, StringBuilder bm) throws IOException {
+   protected void exportBookmark(PDOutlineNode outline, int level, PrintWriter output) throws IOException {
       PDOutlineItem current = outline.getFirstChild();
       while (current != null) {
          // Handle this one
          PDFBookmark bookmark = new PDFBookmark(current, level);
-         renderBookmark(bookmark, bm);
+         renderBookmark(bookmark, output);
          
          // Handle any children
-         exportBookmark(current, level+1, bm);
+         exportBookmark(current, level+1, output);
          
          // Next one at our level, if any
          current = current.getNextSibling();
       }
    }
-   protected void renderBookmark(PDFBookmark bookmark, StringBuilder bm) throws IOException {
+   protected void renderBookmark(PDFBookmark bookmark, PrintWriter bm) throws IOException {
       bm.append(BookmarkBegin).append(System.lineSeparator());
       bm.append(BookmarkTitle).append(": ")
          .append(bookmark.getTitle()).append(System.lineSeparator());
       bm.append(BookmarkLevel).append(": ")
-         .append(bookmark.getLevel()).append(System.lineSeparator());
+         .append(""+bookmark.getLevel()).append(System.lineSeparator());
       
       if (bookmark.getPageNumber() > 0)
          bm.append(BookmarkPageNumber).append(": ")
-           .append(bookmark.getPageNumber()).append(System.lineSeparator());
+           .append(""+bookmark.getPageNumber()).append(System.lineSeparator());
       
       if (bookmark.getYOffset() > 0)
          bm.append(BookmarkYOffset).append(": ")
-            .append(bookmark.getYOffset()).append(System.lineSeparator());
+            .append(""+bookmark.getYOffset()).append(System.lineSeparator());
       
       if (bookmark.getZoom() != null)
          bm.append(BookmarkZoom).append(": ")
