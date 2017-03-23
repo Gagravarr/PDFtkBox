@@ -20,25 +20,21 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.interactive.action.PDAction;
-import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDestination;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageFitDestination;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineNode;
 
 /**
  * Helper for using Apache PDFBox to fetch / set bookmarks
+ * 
+ * TODO Create/Set support
  */
 public class Bookmarks implements Closeable {
-   public static final String BookmarkBegin = "BookmarkBegin";
-   public static final String BookmarkTitle = "BookmarkTitle";
-   public static final String BookmarkLevel = "BookmarkLevel";
+   public static final String BookmarkBegin   = "BookmarkBegin";
+   public static final String BookmarkTitle   = "BookmarkTitle";
+   public static final String BookmarkLevel   = "BookmarkLevel";
    public static final String BookmarkPageNumber = "BookmarkPageNumber";
-   public static final String BookmarkZoom = "BookmarkZoom";
+   public static final String BookmarkZoom    = "BookmarkZoom";
    public static final String BookmarkYOffset = "BookmarkYOffset";
    
    private PDDocument document;
@@ -55,57 +51,41 @@ public class Bookmarks implements Closeable {
       if (outline == null) return null;
       
       StringBuilder bm = new StringBuilder();
-      exportBookmark(bm, outline, 1);
+      exportBookmark(outline, 1, bm);
       return bm.toString();
    }
-   protected void exportBookmark(StringBuilder bm, PDOutlineNode bookmark, int level) throws IOException {
-      PDOutlineItem current = bookmark.getFirstChild();
+   protected void exportBookmark(PDOutlineNode outline, int level, StringBuilder bm) throws IOException {
+      PDOutlineItem current = outline.getFirstChild();
       while (current != null) {
-         PDDestination dest = null;
-
-         // Check for a bookmark via an action
-         if (current.getAction() != null) {
-            PDAction action = current.getAction();
-            if (action instanceof PDActionGoTo) {
-               dest = ((PDActionGoTo)action).getDestination();
-            }
-         }
-         if (dest == null) {
-            dest = current.getDestination();
-         }
+         // Handle this one
+         PDFBookmark bookmark = new PDFBookmark(current, level);
+         renderBookmark(bookmark, bm);
          
-         if (dest != null) {
-            bm.append(BookmarkBegin).append(System.lineSeparator());
-            bm.append(BookmarkTitle).append(": ")
-               .append(current.getTitle()).append(System.lineSeparator());
-            bm.append(BookmarkLevel).append(": ")
-               .append(level).append(System.lineSeparator());
-            
-            if (dest instanceof PDPageDestination) {
-               PDPageDestination pdest = (PDPageDestination)dest;
-               int pageNum = pdest.retrievePageNumber();
-               if (pageNum != -1) {
-                  bm.append(BookmarkPageNumber).append(": ")
-                     .append(pageNum+1).append(System.lineSeparator());
-               } else {
-                  System.err.println("Error - " + pdest);
-               }
-            }
-            
-            // TODO
-            if (dest instanceof PDPageXYZDestination) {
-               
-            }
-            else if (dest instanceof PDPageFitDestination) {
-               // etc
-            }
-            
-            System.err.println("TODO: " + dest);
-         }
+         // Handle any children
+         exportBookmark(current, level+1, bm);
          
-         exportBookmark(bm, current, level+1);
+         // Next one at our level, if any
          current = current.getNextSibling();
       }
+   }
+   protected void renderBookmark(PDFBookmark bookmark, StringBuilder bm) throws IOException {
+      bm.append(BookmarkBegin).append(System.lineSeparator());
+      bm.append(BookmarkTitle).append(": ")
+         .append(bookmark.getTitle()).append(System.lineSeparator());
+      bm.append(BookmarkLevel).append(": ")
+         .append(bookmark.getLevel()).append(System.lineSeparator());
+      
+      if (bookmark.getPageNumber() > 0)
+         bm.append(BookmarkPageNumber).append(": ")
+           .append(bookmark.getPageNumber()).append(System.lineSeparator());
+      
+      if (bookmark.getYOffset() > 0)
+         bm.append(BookmarkYOffset).append(": ")
+            .append(bookmark.getYOffset()).append(System.lineSeparator());
+      
+      if (bookmark.getZoom() != null)
+         bm.append(BookmarkZoom).append(": ")
+            .append(bookmark.getZoom()).append(System.lineSeparator());
    }
    
    @Override

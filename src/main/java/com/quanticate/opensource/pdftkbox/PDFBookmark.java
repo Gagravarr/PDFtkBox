@@ -22,6 +22,8 @@ import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageFitDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageFitHeightDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageFitWidthDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 
@@ -29,7 +31,7 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlin
  * Wrapper around PDFBox bookmarks to provide (just) the
  *  information we need
  * 
- * TODO Helper class for PDFBox decoding
+ * TODO Create support
  */
 public class PDFBookmark {
    public enum ZoomType {
@@ -82,7 +84,6 @@ public class PDFBookmark {
             }
          }
 
-         // TODO
          if (dest instanceof PDPageXYZDestination) {
             PDPageXYZDestination xyz = (PDPageXYZDestination)dest;
             yOffset = xyz.getTop();
@@ -92,14 +93,26 @@ public class PDFBookmark {
                zoom = Integer.toString((int)(xyz.getZoom()*100));
             } else {
                zoomType = ZoomType.Inherit;
-               zoom = zoomType.name();
             }
+         } else if (dest instanceof PDPageFitWidthDestination) {
+            PDPageFitWidthDestination width = (PDPageFitWidthDestination)dest;
+            yOffset = width.getTop();
+            
+            zoomType = ZoomType.FitWidth;
+         } else if (dest instanceof PDPageFitDestination) {
+            zoomType = ZoomType.FitPage;
+         } else if (dest instanceof PDPageFitHeightDestination) {
+            zoomType = ZoomType.FitHeight;
+         } else {
+            System.err.println("TODO: Support destination of type " + dest);
          }
-         else if (dest instanceof PDPageFitDestination) {
-            // etc
+         
+         // Set a zoom description from the type if needed
+         if (zoomType != null && zoom == null) {
+            zoom = zoomType.name();
          }
-
-         System.err.println("TODO: " + dest);
+      } else {
+         System.err.println("Warning - Non-destination bookmark " + current);
       }
    }
 
