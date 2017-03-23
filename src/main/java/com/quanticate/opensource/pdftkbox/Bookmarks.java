@@ -186,7 +186,7 @@ public class Bookmarks implements Closeable {
       // Any children to progress?
       PDFBookmark next = bookmarks.get(pos+1);
       int nextLevel = next.getLevel();
-      if (nextLevel >= level) {
+      if (nextLevel == level) {
          // Sibling
          return 1 + importBookmark(pos+1, bookmarks, nextLevel, outline);
       } else if (nextLevel >= level) {

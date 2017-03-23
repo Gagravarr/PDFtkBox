@@ -1,4 +1,4 @@
 TODOs:
  * Unit tests
- * Write/Import support
+ * PDFtk argument support
  * Better command argument parsing
