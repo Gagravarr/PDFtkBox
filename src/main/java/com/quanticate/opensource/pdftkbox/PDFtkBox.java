@@ -103,13 +103,14 @@ public class PDFtkBox {
             return;
          }
       } catch (ParseException pe) {}
-
+      
       // TODO PDFtk style options
       
       doPrintHelp(optsHelp, optsNormal);
    }
    
    protected static void doPrintHelp(Options optsHelp, Options optsNormal) {
+      // TODO More helpful help
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp("PDFtkBox", optsNormal);
       formatter.printHelp("PDFtkBox", optsHelp);
@@ -147,7 +148,7 @@ public class PDFtkBox {
       }
       BufferedReader input = new BufferedReader(new InputStreamReader(istream,"UTF-8"));
 
-      // TODO Import
+      bm.importBookmarks(input, new File(args[0]));
       
       input.close();
       bm.close();

@@ -90,11 +90,19 @@ public class Bookmarks implements Closeable {
             .append(bookmark.getZoom()).append(System.lineSeparator());
    }
    
-   public void importBookmarks(BufferedReader bookmarkText, File output) {
+   public void importBookmarks(BufferedReader bookmarkText, File output) throws IOException {
+      // Process the wanted bookmarks text
       // TODO
       List<PDFBookmark> bookmarks = parseBookmarks("TODO");
       
+      // Prepare for the new bookmarks
+      PDDocumentOutline outline =  new PDDocumentOutline();
+      document.getDocumentCatalog().setDocumentOutline( outline );
       
+      // TODO Import with recursive descent
+      
+      // Save the new version
+      document.save(output);
    }
    
    /**

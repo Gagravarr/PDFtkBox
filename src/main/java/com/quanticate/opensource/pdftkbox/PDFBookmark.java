@@ -115,6 +115,49 @@ public class PDFBookmark {
          System.err.println("Warning - Non-destination bookmark " + current);
       }
    }
+   
+   public PDOutlineItem createOutline(String title, int pageNumber, int yOffset, String zoom) {
+      PDOutlineItem bookmark = new PDOutlineItem();
+      bookmark.setTitle(title);
+      
+      PDPageDestination dest = null;
+      if (zoom != null) {
+         ZoomType zoomType = null;
+         for (ZoomType type : ZoomType.values()) {
+            if (type.name().equalsIgnoreCase(zoom)) {
+               zoomType = type;
+               break;
+            }
+         }
+         
+         if (zoomType == ZoomType.Inherit || zoom.endsWith("%")) {
+            PDPageXYZDestination xyz = new PDPageXYZDestination();
+            xyz.setTop(yOffset);
+            
+            if (zoomType == ZoomType.Inherit) {
+               xyz.setZoom(-1);
+            } else {
+               String zoomNoPcnt = zoom.substring(0, zoom.length()-1).trim();
+               float zoomf = Integer.parseInt(zoomNoPcnt) / 100.0f;
+               xyz.setZoom(zoomf);
+            }
+         } else if (zoomType == ZoomType.FitPage) {
+            dest = new PDPageFitDestination();
+         } else if (zoomType == ZoomType.FitHeight) {
+            dest = new PDPageFitHeightDestination();
+         }
+         // Otherwise fall through to the default, FitWidth
+      }
+      if (dest == null) {
+         PDPageFitWidthDestination wdest = new PDPageFitWidthDestination();
+         wdest.setTop(yOffset);
+         dest = wdest;
+      }
+         
+      dest.setPageNumber(pageNumber-1);
+      bookmark.setDestination(dest);
+      return bookmark;
+   }
 
    protected PDOutlineItem getOutlineItem()
    {
