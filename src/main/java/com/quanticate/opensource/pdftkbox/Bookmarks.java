@@ -15,6 +15,7 @@
 ==================================================================== */
 package com.quanticate.opensource.pdftkbox;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -87,6 +88,13 @@ public class Bookmarks implements Closeable {
       if (bookmark.getZoom() != null)
          bm.append(BookmarkZoom).append(": ")
             .append(bookmark.getZoom()).append(System.lineSeparator());
+   }
+   
+   public void importBookmarks(BufferedReader bookmarkText, File output) {
+      // TODO
+      List<PDFBookmark> bookmarks = parseBookmarks("TODO");
+      
+      
    }
    
    /**

@@ -15,8 +15,12 @@
 ==================================================================== */
 package com.quanticate.opensource.pdftkbox;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import org.apache.commons.cli.CommandLine;
@@ -87,10 +91,12 @@ public class PDFtkBox {
          CommandLine line = parser.parse(optsNormal, args);
          
          if (line.hasOption(optExport.getOpt())) {
-            doExport( line.getOptionValue(optExport.getOpt()), line.getArgs() );
+            doExport( line.getOptionValue(optExport.getOpt()), 
+                      line.getOptionValue(optBookmarks.getOpt()), 
+                      line.getArgs() );
             return;
          }
-         if (line.hasOption(optImport.getOpt())) {
+         if (line.hasOption(optImport.getOpt()) && line.getArgs().length > 0) {
             doImport( line.getOptionValue(optExport.getOpt()), 
                       line.getOptionValue(optBookmarks.getOpt()), 
                       line.getArgs() );
@@ -109,22 +115,41 @@ public class PDFtkBox {
       formatter.printHelp("PDFtkBox", optsHelp);
    }
    
-   protected static void doExport(String pdf, String[] args) throws IOException {
+   protected static void doExport(String pdf, String bookmarks, String[] args) throws IOException {
       Bookmarks bm = new Bookmarks(new File(pdf));
       
+      File bmf = null;
+      if (bookmarks != null) {
+         bmf = new File(bookmarks);
+      } else if (args.length > 0) {
+         bmf = new File(args[0]);
+      }
+      
       PrintWriter output;
-      if (args.length == 0) {
+      if (bmf == null) {
          output = new PrintWriter(System.out);
       } else {
-         output = new PrintWriter(new File(args[0]), "UTF-8");
+         output = new PrintWriter(bmf, "UTF-8");
       }
       
       bm.exportBookmarks(output);
       output.close();
       bm.close();
    }
-   protected static void doImport(String pdf, String bookmarks, String[] args) {
-      // TODO
-      System.err.println("TODO Import");
+   protected static void doImport(String pdf, String bookmarks, String[] args) throws IOException {
+      Bookmarks bm = new Bookmarks(new File(pdf));
+
+      InputStream istream;
+      if (bookmarks != null) {
+         istream = new FileInputStream(new File(bookmarks));
+      } else {
+         istream = System.in;
+      }
+      BufferedReader input = new BufferedReader(new InputStreamReader(istream,"UTF-8"));
+
+      // TODO Import
+      
+      input.close();
+      bm.close();
    }
 }
