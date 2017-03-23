@@ -13,7 +13,7 @@ far down the page a bookmark should take you to (it's hard coded to the top).
 
 As I've thus far been unable to persuade the authors of PDFtk to take money
 in exchange for adding these two bookmark features, I've instead created
-this project as an alternative.
+this project as an alternative...
 
 Powered by Apache PDFBox, written in Java rather than C, this tool allows 
 you to export PDF Bookmarks (including Zoom and Y offset), and import them
@@ -25,14 +25,28 @@ Exporting Bookmarks
 This can be done in the "pdftk compatible way", or with a more bookmary-y
 option as we know we're only working on bookmarks.
 
-''TODO''
+To export the bookmarks to Standard Output (StdOut), use one of:
+ java -jar PDFtkBox.jar -export <input.pdf>
+ java -jar PDFtkBox.jar <input.pdf> dump_data
+
+To export the bookmarks to a new text file, use one of:
+ java -jar PDFtkBox.jar -export <input.pdf> <bookmarks.txt>
+ java -jar PDFtkBox.jar -export <input.pdf> -bookmarks <bookmarks.txt>
+ java -jar PDFtkBox.jar <input.pdf> dump_data output <bookmarks.txt>
 
 Importing Bookmarks
 -------------------
 This can be done in the "pdftk compatible way", or with a simpler set of options
 as we know we're only working on bookmarks.
 
-''TODO''
+To import the bookmarks, from Standard In (StdIn), saving as a new file, use
+one of:
+ java -jar PDFtkBox.jar -import <input.pdf> <output.pdf>
+ java -jar PDFtkBox.jar <input.pdf> update_info - <output.pdf>
+
+To import the bookmarks, from a text file, saving as a new file, use one of:
+ java -jar PDFtkBox.jar -import <input.pdf> -bookmarks <bookmarks.txt> <output.pdf>
+ java -jar PDFtkBox.jar <input.pdf> update_info <bookmarks.txt> <output.pdf>
 
 Bookmark Definition
 -------------------
@@ -46,10 +60,12 @@ BookmarkZoom: inherit
 BookmarkYOffset: 230
 
 The zoom can be one of:
- * inherit  - Inherit zoom
- * fit      - Fit page width+height
- * fitwidth - Fit page width
- * ''TODO Rest''
+ * Inherit   - Inherit zoom
+ * FitPage   - Fit page width+height
+ * FitWidth  - Fit page width
+ * FitHeight - Fit page height
+ * ##        - Zoom to ##% eg 50 = 50% zoom
 
-The default zoom is, in keeping with pdftk, is fitwidth
-The default y offset, in keeping with pdftk, is 0 (top)
+The default zoom is, in keeping with PDFtk, is FitWidth
+
+The default Y Offset, in keeping with PDFtk, is 0 (top)

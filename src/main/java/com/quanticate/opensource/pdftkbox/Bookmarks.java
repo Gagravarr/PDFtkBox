@@ -18,6 +18,8 @@ package com.quanticate.opensource.pdftkbox;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
@@ -86,6 +88,23 @@ public class Bookmarks implements Closeable {
       if (bookmark.getZoom() != null)
          bm.append(BookmarkZoom).append(": ")
             .append(bookmark.getZoom()).append(System.lineSeparator());
+   }
+   
+   /**
+    * Parses a list of PDFtk-like Bookmark text into our 
+    *  wrapper objects
+    */
+   public List<PDFBookmark> parseBookmarks(String bookmarkText) {
+      List<PDFBookmark> bookmarks = new ArrayList<>();
+      
+      for (String bm : bookmarkText.split(BookmarkBegin)) {
+         if (bm.trim().isEmpty()) continue;
+         
+         // TODO
+         System.err.println("TODO: " + bm);
+      }
+      
+      return bookmarks;
    }
    
    @Override

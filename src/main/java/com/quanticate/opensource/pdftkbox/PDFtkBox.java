@@ -16,43 +16,110 @@
 package com.quanticate.opensource.pdftkbox;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 /**
  * PDFtk bookmark replacement, powered by Apache PDFBox
  */
 public class PDFtkBox {
    public static void main(String[] args) throws Exception {
-      Options options = new Options();
-      
-      // TODO Different options for different use-cases
-      
-      options.addOption(new Option("help", "print this message"));
-      options.addOption(
-            Option.builder("import")
-            .hasArg()
-            .numberOfArgs(2)
-            .desc("import bookmarks from odf" )
-            .argName("pdf").build()
+      // For printing help
+      Options optsHelp = new Options();
+      optsHelp.addOption(
+            Option.builder("help")
+            .required()
+            .desc("print this message")
+            .build()
       );
-      options.addOption(
+      
+      // Normal-style import/export
+      Options optsNormal = new Options();
+      OptionGroup normal = new OptionGroup();
+      Option optExport =
             Option.builder("export")
+            .required()
             .hasArg()
             .desc("export bookmarks from pdf" )
-            .argName("pdf").build()
-      );
+            .argName("pdf").build();
+      normal.addOption(optExport);
+      Option optImport = 
+            Option.builder("import")
+            .required()
+            .hasArg()
+            .desc("import bookmarks to pdf" )
+            .argName("pdf").build();
+      normal.addOption(optImport);
+      optsNormal.addOptionGroup(normal);
+      Option optBookmarks = 
+            Option.builder("bookmarks")
+            .hasArg()
+            .desc("bookmarks definition file" )
+            .argName("bookmarks").build();
+      optsNormal.addOption(optBookmarks);
       
+      // TODO PDFtk style options
+
+      
+      // What are we doing?
+      CommandLineParser parser = new DefaultParser();
+      
+      // Did they want help?
+      try {
+         parser.parse(optsHelp, args);
+         
+         // If we get here, they asked for help
+         doPrintHelp(optsHelp, optsNormal);
+         return;
+      } catch (ParseException pe) {}
+      
+      // Normal-style import/export?
+      try {
+         CommandLine line = parser.parse(optsNormal, args);
+         
+         if (line.hasOption(optExport.getOpt())) {
+            doExport( line.getOptionValue(optExport.getOpt()), line.getArgs() );
+            return;
+         }
+         if (line.hasOption(optImport.getOpt())) {
+            doImport( line.getOptionValue(optExport.getOpt()), 
+                      line.getOptionValue(optBookmarks.getOpt()), 
+                      line.getArgs() );
+            return;
+         }
+      } catch (ParseException pe) {}
+
+      // TODO Rest
+      
+      doPrintHelp(optsHelp, optsNormal);
+   }
+   
+   protected static void doPrintHelp(Options optsHelp, Options optsNormal) {
       HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp( "PDFtkBox", options );
-      
-      // TODO Do this properly
-      if (args.length >= 2) {
-         Bookmarks bm = new Bookmarks(new File(args[1]));
+      formatter.printHelp("PDFtkBox", optsNormal);
+      formatter.printHelp("PDFtkBox", optsHelp);
+   }
+   
+   protected static void doExport(String pdf, String[] args) throws IOException {
+      Bookmarks bm = new Bookmarks(new File(pdf));
+      if (args.length == 0) {
          System.out.println(bm.getBookmarks());
-         bm.close();
+      } else {
+         // TODO Write to the file
+         System.err.println("TODO - Write to " + args[0]);
       }
+      bm.close();
+   }
+   protected static void doImport(String pdf, String bookmarks, String[] args) {
+      // TODO
+      System.err.println("TODO Import");
    }
 }
