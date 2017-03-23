@@ -30,8 +30,6 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlin
 
 /**
  * Helper for using Apache PDFBox to fetch / set bookmarks
- * 
- * TODO Create/Set support
  */
 public class Bookmarks implements Closeable {
    public static final String BookmarkBegin   = "BookmarkBegin";
@@ -99,17 +97,19 @@ public class Bookmarks implements Closeable {
    
    public void importBookmarks(BufferedReader bookmarkText, File output) throws IOException {
       // Process the wanted bookmarks text
-      // TODO
       List<PDFBookmark> bookmarks = parseBookmarks(bookmarkText);
       
       // Prepare for the new bookmarks
       PDDocumentOutline outline =  new PDDocumentOutline();
       document.getDocumentCatalog().setDocumentOutline( outline );
       
-      // TODO Import with recursive descent
+      // Import with recursive descent
+      boolean valid = importAllBookmarks(bookmarks, outline);
       
-      // Save the new version
-      document.save(output);
+      // Save the new version, if appropriate
+      if (valid) {
+         document.save(output);
+      }
    }
    
    /**
@@ -120,14 +120,18 @@ public class Bookmarks implements Closeable {
       List<PDFBookmark> bookmarks = new ArrayList<>();
       
       String title = null, zoom = null;
-      int level, pageNumber, yOffset;
+      int level= -1, pageNumber = -1, yOffset = 0;
       
       boolean going = true;
       while (going) {
          String line = bookmarkText.readLine();
          if (line == null) going = false;
          if (line == null || line.equalsIgnoreCase(BookmarkBegin)) {
-            // TODO Create a bookmark if we can
+            if (title != null && level > 0 && pageNumber > 0) {
+               bookmarks.add(new PDFBookmark(title, level, pageNumber, yOffset, zoom));
+            }
+            title = null; zoom = null;
+            level = -1; pageNumber = -1; yOffset = 0;
          } else {
             String ll = line.toLowerCase();
             int splitAt = ll.indexOf(':');
@@ -150,6 +154,22 @@ public class Bookmarks implements Closeable {
       
       return bookmarks;
    }
+
+   /** Recursive descent import */
+   protected boolean importAllBookmarks(List<PDFBookmark> bookmarks, PDDocumentOutline outline) {
+      if (bookmarks.isEmpty()) {
+         System.err.println("Error - no bookmarks found to import");
+         return false;
+      }
+      if (bookmarks.get(0).getLevel() != 0) {
+         System.err.println("Error - first bookmark must start at level 1");
+         return false;
+      }
+      
+      // TODO Import
+      return false;
+   }
+   
    
    @Override
    public void close() throws IOException {

@@ -43,7 +43,18 @@ public class PDFBookmark {
    private int yOffset;
    private ZoomType zoomType;
    private String zoom;
-   
+
+   /**
+    * Creates a Bookmark Wrapper based on an import
+    */
+   public PDFBookmark(String title, int level, int pageNumber, int yOffset, String zoom) {
+      this.title = title;
+      this.level = level;
+      this.pageNumber = pageNumber;
+      this.yOffset = yOffset;
+      this.zoom = zoom;
+   }
+
    /**
     * Creates our Bookmark Wrapper from the outline item.
     * Handling Children (and tracking of levels) is up to
@@ -114,7 +125,10 @@ public class PDFBookmark {
       }
    }
    
-   public PDOutlineItem createOutline(String title, int pageNumber, int yOffset, String zoom) {
+   public PDOutlineItem createOutline() {
+      return createOutline(this.title, this.pageNumber, this.yOffset, this.zoom);
+   }
+   public static PDOutlineItem createOutline(String title, int pageNumber, int yOffset, String zoom) {
       PDOutlineItem bookmark = new PDOutlineItem();
       bookmark.setTitle(title);
       
