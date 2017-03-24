@@ -170,6 +170,10 @@ public class PDFBookmark {
       if (zoom == null || zoom.isEmpty()) return null;
       
       if (zoom.endsWith("%")) return ZoomType.ZoomPercent;
+      try {
+         Integer.parseInt(zoom);
+         return ZoomType.ZoomPercent;
+      } catch (NumberFormatException e) {}
       
       for (ZoomType type : ZoomType.values()) {
          if (type.name().equalsIgnoreCase(zoom)) {
