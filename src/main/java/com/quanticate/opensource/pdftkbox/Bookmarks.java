@@ -168,17 +168,22 @@ public class Bookmarks implements Closeable {
          return false;
       }
       
+      List<PDOutlineNode> parents = new ArrayList<>();
+      parents.add(outline);
+      
       int pos = 0;
       while (pos < bookmarks.size()) {
-         pos += importBookmark(pos, bookmarks, 1, outline);
+         pos += importBookmark(pos, bookmarks, parents);
       }
       
       return true;
    }
-   protected int importBookmark(int pos, List<PDFBookmark> bookmarks, int level, PDOutlineNode outline) {
+   protected int importBookmark(int pos, List<PDFBookmark> bookmarks, List<PDOutlineNode> parents) {
       PDFBookmark bookmark = bookmarks.get(pos);
       PDOutlineItem asOutline = bookmark.createOutline();
-      outline.addLast(asOutline);
+      
+      int level = parents.size();
+      parents.get(level-1).addLast(asOutline);
       
       // Have we run out of bookmarks?
       if (pos == bookmarks.size()-1) return 1;
@@ -188,12 +193,16 @@ public class Bookmarks implements Closeable {
       int nextLevel = next.getLevel();
       if (nextLevel == level) {
          // Sibling
-         return 1 + importBookmark(pos+1, bookmarks, nextLevel, outline);
+         return 1 + importBookmark(pos+1, bookmarks, parents);
       } else if (nextLevel >= level) {
          // Child
-         return 1 + importBookmark(pos+1, bookmarks, nextLevel, asOutline);
+         parents.add(asOutline);
+         return 1 + importBookmark(pos+1, bookmarks, parents);
       } else {
-         // Sibling of a parent - back out to process
+         // Above us, back out a bit
+         for (int i=level; i>nextLevel; i--) {
+            parents.remove(i-1);
+         }
          return 1;
       }
    }

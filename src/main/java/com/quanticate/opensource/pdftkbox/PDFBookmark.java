@@ -53,6 +53,7 @@ public class PDFBookmark {
       this.pageNumber = pageNumber;
       this.yOffset = yOffset;
       this.zoom = zoom;
+      this.zoomType = identifyZoomType(zoom);
    }
 
    /**
@@ -134,15 +135,9 @@ public class PDFBookmark {
       
       PDPageDestination dest = null;
       if (zoom != null) {
-         ZoomType zoomType = null;
-         for (ZoomType type : ZoomType.values()) {
-            if (type.name().equalsIgnoreCase(zoom)) {
-               zoomType = type;
-               break;
-            }
-         }
+         ZoomType zoomType = identifyZoomType(zoom);
          
-         if (zoomType == ZoomType.Inherit || zoom.endsWith("%")) {
+         if (zoomType == ZoomType.Inherit || zoomType == ZoomType.ZoomPercent) {
             PDPageXYZDestination xyz = new PDPageXYZDestination();
             xyz.setTop(yOffset);
             
@@ -170,22 +165,33 @@ public class PDFBookmark {
       bookmark.setDestination(dest);
       return bookmark;
    }
+   
+   protected static ZoomType identifyZoomType(String zoom) {
+      if (zoom == null || zoom.isEmpty()) return null;
+      
+      if (zoom.endsWith("%")) return ZoomType.ZoomPercent;
+      
+      for (ZoomType type : ZoomType.values()) {
+         if (type.name().equalsIgnoreCase(zoom)) {
+            return type;
+         }
+      }
+      
+      return null;
+   }
 
-   protected PDOutlineItem getOutlineItem()
-   {
+   protected PDOutlineItem getOutlineItem() {
       return outlineItem;
    }
 
-   public String getTitle()
-   {
+   public String getTitle() {
       return title;
    }
 
    /**
     * Get the Bookmark (indent) level, from 1+
     */
-   public int getLevel()
-   {
+   public int getLevel() {
       return level;
    }
 
@@ -193,23 +199,22 @@ public class PDFBookmark {
     * Get the number of the Page this bookmark refers
     *  to (1+), or -1 if this isn't a page-based bookmark
     */
-   public int getPageNumber()
-   {
+   public int getPageNumber() {
       return pageNumber;
    }
 
-   public int getYOffset()
-   {
+   public int getYOffset() {
       return yOffset;
    }
-
-   public ZoomType getZoomType()
-   {
+   public ZoomType getZoomType() {
       return zoomType;
    }
-
-   public String getZoom()
-   {
+   public String getZoom() {
       return zoom;
+   }
+   
+   public String toString() {
+      return "Bookmark to page " + pageNumber + " @ " + level + " / " + zoom + 
+             " - " + title;
    }
 }
