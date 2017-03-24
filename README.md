@@ -26,13 +26,13 @@ This can be done in the "pdftk compatible way", or with a more bookmary-y
 option as we know we're only working on bookmarks.
 
 To export the bookmarks to Standard Output (StdOut), use one of:
- java -jar PDFtkBox.jar -export <input.pdf>
- java -jar PDFtkBox.jar <input.pdf> dump_data
+ * `java -jar PDFtkBox.jar -export <input.pdf>`
+ * `java -jar PDFtkBox.jar <input.pdf> dump_data`
 
 To export the bookmarks to a new text file, use one of:
- java -jar PDFtkBox.jar -export <input.pdf> <bookmarks.txt>
- java -jar PDFtkBox.jar -export <input.pdf> -bookmarks <bookmarks.txt>
- java -jar PDFtkBox.jar <input.pdf> dump_data output <bookmarks.txt>
+ * `java -jar PDFtkBox.jar -export <input.pdf> <bookmarks.txt>`
+ * `java -jar PDFtkBox.jar -export <input.pdf> -bookmarks <bookmarks.txt>`
+ *` java -jar PDFtkBox.jar <input.pdf> dump_data output <bookmarks.txt>`
 
 Importing Bookmarks
 -------------------
@@ -41,12 +41,12 @@ as we know we're only working on bookmarks.
 
 To import the bookmarks, from Standard In (StdIn), saving as a new file, use
 one of:
- java -jar PDFtkBox.jar -import <input.pdf> <output.pdf>
- java -jar PDFtkBox.jar <input.pdf> update_info - <output.pdf>
+ * `java -jar PDFtkBox.jar -import <input.pdf> <output.pdf>`
+ * `java -jar PDFtkBox.jar <input.pdf> update_info - <output.pdf>`
 
 To import the bookmarks, from a text file, saving as a new file, use one of:
- java -jar PDFtkBox.jar -import <input.pdf> -bookmarks <bookmarks.txt> <output.pdf>
- java -jar PDFtkBox.jar <input.pdf> update_info <bookmarks.txt> <output.pdf>
+ * `java -jar PDFtkBox.jar -import <input.pdf> -bookmarks <bookmarks.txt> <output.pdf>`
+ * `java -jar PDFtkBox.jar <input.pdf> update_info <bookmarks.txt> <output.pdf>`
 
 Bookmark Definition
 -------------------
@@ -60,11 +60,11 @@ BookmarkZoom: inherit
 BookmarkYOffset: 230
 
 The zoom can be one of:
- * Inherit   - Inherit zoom
- * FitPage   - Fit page width+height
- * FitWidth  - Fit page width
- * FitHeight - Fit page height
- * ##        - Zoom to ##% eg 50 = 50% zoom
+ * `Inherit`   - Inherit zoom
+ * `FitPage`   - Fit page width+height
+ * `FitWidth`  - Fit page width
+ * `FitHeight` - Fit page height
+ * `##%`       - Zoom to `##%` eg `50%` = 50% zoom
 
 The default zoom is, in keeping with PDFtk, is FitWidth
 
