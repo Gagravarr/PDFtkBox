@@ -32,7 +32,7 @@ To export the bookmarks to Standard Output (StdOut), use one of:
 To export the bookmarks to a new text file, use one of:
  * `java -jar PDFtkBox.jar -export <input.pdf> <bookmarks.txt>`
  * `java -jar PDFtkBox.jar -export <input.pdf> -bookmarks <bookmarks.txt>`
- *` java -jar PDFtkBox.jar <input.pdf> dump_data output <bookmarks.txt>`
+ * `java -jar PDFtkBox.jar <input.pdf> dump_data output <bookmarks.txt>`
 
 Importing Bookmarks
 -------------------
@@ -52,12 +52,14 @@ Bookmark Definition
 -------------------
 This format is based on the PDFtk one, with extra fields for Zoom and Y offset.
 
+```
 BookmarkBegin
 BookmarkTitle: Page Title
 BookmarkLevel: 1
-BookmarkPageNumber: 1
-BookmarkZoom: inherit
+BookmarkPageNumber: 2
+BookmarkZoom: Inherit
 BookmarkYOffset: 230
+```
 
 The zoom can be one of:
  * `Inherit`   - Inherit zoom
