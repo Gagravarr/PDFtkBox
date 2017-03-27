@@ -100,7 +100,7 @@ public class PDFBookmark {
             
             if (xyz.getZoom() > 0) {
                zoomType = ZoomType.ZoomPercent;
-               zoom = Integer.toString((int)(xyz.getZoom()*100));
+               zoom = Integer.toString((int)(xyz.getZoom()*100)) + "%";
             } else {
                zoomType = ZoomType.Inherit;
             }
@@ -127,19 +127,22 @@ public class PDFBookmark {
    }
    
    public PDOutlineItem createOutline() {
-      return createOutline(this.title, this.pageNumber, this.yOffset, this.zoom);
+      return createOutline(this.title, this.pageNumber, this.yOffset, this.zoom, this.zoomType);
    }
    public static PDOutlineItem createOutline(String title, int pageNumber, int yOffset, String zoom) {
+      ZoomType zoomType = identifyZoomType(zoom);
+      return createOutline(title, pageNumber, yOffset, zoom, zoomType);
+   }
+   public static PDOutlineItem createOutline(String title, int pageNumber, int yOffset, String zoom, ZoomType zoomType) {
       PDOutlineItem bookmark = new PDOutlineItem();
       bookmark.setTitle(title);
       
       PDPageDestination dest = null;
       if (zoom != null) {
-         ZoomType zoomType = identifyZoomType(zoom);
-         
          if (zoomType == ZoomType.Inherit || zoomType == ZoomType.ZoomPercent) {
             PDPageXYZDestination xyz = new PDPageXYZDestination();
             xyz.setTop(yOffset);
+            dest = xyz;
             
             if (zoomType == ZoomType.Inherit) {
                xyz.setZoom(-1);
