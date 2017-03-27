@@ -170,43 +170,33 @@ public class Bookmarks implements Closeable {
       
       List<PDOutlineNode> parents = new ArrayList<>();
       parents.add(outline);
+      PDOutlineItem last = null;
       
-      int pos = 0;
-      while (pos < bookmarks.size()) {
-         pos += importBookmark(pos, bookmarks, parents);
+      for (PDFBookmark bookmark : bookmarks) {
+         // Convert
+         PDOutlineItem asOutline = bookmark.createOutline();
+         
+         // Store at the right place
+         int lastLevel = parents.size();
+         if (bookmark.getLevel() == lastLevel) {
+            // Sibling, no change needed
+         } else if (bookmark.getLevel() > lastLevel) {
+            // Child, add previous as parent
+            parents.add(last);
+         } else {
+            // Higher up, remove un-needed parents
+            for (int i=bookmark.getLevel(); i<lastLevel; i++) {
+               parents.remove(parents.size()-1);
+            }
+         }
+         parents.get(parents.size()-1).addLast(asOutline);
+         
+         // Prepare for the next one
+         last = asOutline;
       }
       
       return true;
    }
-   protected int importBookmark(int pos, List<PDFBookmark> bookmarks, List<PDOutlineNode> parents) {
-      PDFBookmark bookmark = bookmarks.get(pos);
-      PDOutlineItem asOutline = bookmark.createOutline();
-      
-      int level = parents.size();
-      parents.get(level-1).addLast(asOutline);
-      
-      // Have we run out of bookmarks?
-      if (pos == bookmarks.size()-1) return 1;
-      
-      // Any children to progress?
-      PDFBookmark next = bookmarks.get(pos+1);
-      int nextLevel = next.getLevel();
-      if (nextLevel == level) {
-         // Sibling
-         return 1 + importBookmark(pos+1, bookmarks, parents);
-      } else if (nextLevel >= level) {
-         // Child
-         parents.add(asOutline);
-         return 1 + importBookmark(pos+1, bookmarks, parents);
-      } else {
-         // Above us, back out a bit
-         for (int i=level; i>nextLevel; i--) {
-            parents.remove(i-1);
-         }
-         return 1;
-      }
-   }
-   
    
    @Override
    public void close() throws IOException {
