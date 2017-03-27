@@ -77,9 +77,8 @@ public class PDFtkBox {
       Option optDumpData =
             Option.builder("dump_data")
             .required()
-            .hasArg()
             .desc("dump bookmarks from pdf" )
-            .argName("pdf").build();
+            .build();
       pdftk.addOption(optDumpData);
       Option optUpdateInfo = 
             Option.builder("update_info")
@@ -124,38 +123,46 @@ public class PDFtkBox {
          if (line.hasOption(optImport.getOpt()) && line.getArgs().length > 0) {
             doImport( line.getOptionValue(optImport.getOpt()),
                       line.getOptionValue(optBookmarks.getOpt()), 
-                      line.getArgs() );
+                      null, line.getArgs() );
             return;
          }
       } catch (ParseException pe) {}
 
 
-      // Nobble things for PDFtk-style options and Commons CLI
-      if (args.length > 2) {
-         for (int i=0; i<args.length; i += 2) {
+      // PDFtk-style
+      if (args.length > 1) {
+         // Nobble things for PDFtk-style options and Commons CLI
+         for (int i=1; i<args.length; i++) {
             for (Option opt : optsPDFtk.getOptions()) {
                if (args[i].equals(opt.getOpt())) {
                   args[i] = "-" + args[i];
                }
             }
          }
+         try {
+            // Input file comes first, then arguments
+            String input = args[0];
+            String[] pargs = new String[args.length-1];
+            System.arraycopy(args, 1, pargs, 0, pargs.length);
+
+            // Parse what's left and check
+            CommandLine line = parser.parse(optsPDFtk, pargs);
+
+            if (line.hasOption(optDumpData.getOpt())) {
+               doExport(input,
+                     line.getOptionValue(optOutput.getOpt()), 
+                     line.getArgs() );
+               return;
+            }
+            if (line.hasOption(optUpdateInfo.getOpt())) {
+               doImport(input, 
+                     line.getOptionValue(optUpdateInfo.getOpt()),
+                     line.getOptionValue(optOutput.getOpt()), 
+                     line.getArgs() );
+               return;
+            }
+         } catch (ParseException pe) {}
       }
-      try {
-         CommandLine line = parser.parse(optsPDFtk, args);
-         
-         if (line.hasOption(optDumpData.getOpt())) {
-            doExport( line.getOptionValue(optDumpData.getOpt()), 
-                      line.getOptionValue(optOutput.getOpt()), 
-                      line.getArgs() );
-            return;
-         }
-         if (line.hasOption(optUpdateInfo.getOpt()) && line.getArgs().length > 0) {
-            doImport( line.getOptionValue(optUpdateInfo.getOpt()),
-                      line.getOptionValue(optOutput.getOpt()), 
-                      line.getArgs() );
-            return;
-         }
-      } catch (ParseException pe) {}
 
 
       // If in doubt, print help
@@ -174,7 +181,8 @@ public class PDFtkBox {
       
       // Output the PDFtk-style help
       formatter.setOptPrefix("");
-      formatter.printHelp("PDFtkBox", optsPDFtk, true);
+      formatter.printHelp("PDFtkBox <pdf> [dump_data | update_info <file>] output <pdf>", 
+                          optsPDFtk, false);
       
       // Ignore the opts help
    }
@@ -200,7 +208,7 @@ public class PDFtkBox {
       output.close();
       bm.close();
    }
-   protected static void doImport(String pdf, String bookmarks, String[] args) throws IOException {
+   protected static void doImport(String pdf, String bookmarks, String output, String[] args) throws IOException {
       Bookmarks bm = new Bookmarks(new File(pdf));
 
       InputStream istream;
@@ -211,7 +219,14 @@ public class PDFtkBox {
       }
       BufferedReader input = new BufferedReader(new InputStreamReader(istream,"UTF-8"));
 
-      bm.importBookmarks(input, new File(args[0]));
+      File outF;
+      if (output != null) {
+         outF = new File(output);
+      } else {
+         outF = new File(args[0]);
+      }
+      
+      bm.importBookmarks(input, outF);
       
       input.close();
       bm.close();
