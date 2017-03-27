@@ -85,7 +85,7 @@ public class PDFtkBox {
             .required()
             .hasArg()
             .desc("update bookmarks in pdf" )
-            .argName("pdf").build();
+            .argName("bookmarks").build();
       pdftk.addOption(optUpdateInfo);
       optsPDFtk.addOptionGroup(pdftk);
       Option optOutput = 
@@ -181,7 +181,7 @@ public class PDFtkBox {
       
       // Output the PDFtk-style help
       formatter.setOptPrefix("");
-      formatter.printHelp("PDFtkBox <pdf> [dump_data | update_info <file>] output <pdf>", 
+      formatter.printHelp("PDFtkBox <pdf> [dump_data | update_info <bookmarks>] output <pdf>", 
                           optsPDFtk, false);
       
       // Ignore the opts help
