@@ -5,7 +5,7 @@ plugins {
 
 // What we are
 def pkg = 'com.quanticate.opensource.pdftkbox'
-def ver = "0.1"
+def ver = "0.2-SNAPSHOT"
 
 // Powered by Apache PDFBox and Commons CLI
 apply plugin:'java'
