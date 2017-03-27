@@ -99,7 +99,8 @@ public class PDFtkBox {
       
       // What are we doing?
       CommandLineParser parser = new DefaultParser();
-      
+
+
       // Did they want help?
       try {
          parser.parse(optsHelp, args);
@@ -108,7 +109,8 @@ public class PDFtkBox {
          doPrintHelp(optsHelp, optsNormal, optsPDFtk);
          return;
       } catch (ParseException pe) {}
-      
+
+
       // Normal-style import/export?
       try {
          CommandLine line = parser.parse(optsNormal, args);
@@ -126,19 +128,55 @@ public class PDFtkBox {
             return;
          }
       } catch (ParseException pe) {}
-      
-      // TODO PDFtk style options
-      
+
+
+      // Nobble things for PDFtk-style options and Commons CLI
+      if (args.length > 2) {
+         for (int i=0; i<args.length; i += 2) {
+            for (Option opt : optsPDFtk.getOptions()) {
+               if (args[i].equals(opt.getOpt())) {
+                  args[i] = "-" + args[i];
+               }
+            }
+         }
+      }
+      try {
+         CommandLine line = parser.parse(optsPDFtk, args);
+         
+         if (line.hasOption(optDumpData.getOpt())) {
+            doExport( line.getOptionValue(optDumpData.getOpt()), 
+                      line.getOptionValue(optOutput.getOpt()), 
+                      line.getArgs() );
+            return;
+         }
+         if (line.hasOption(optUpdateInfo.getOpt()) && line.getArgs().length > 0) {
+            doImport( line.getOptionValue(optUpdateInfo.getOpt()),
+                      line.getOptionValue(optOutput.getOpt()), 
+                      line.getArgs() );
+            return;
+         }
+      } catch (ParseException pe) {}
+
+
+      // If in doubt, print help
       doPrintHelp(optsHelp, optsNormal, optsPDFtk);
    }
    
    protected static void doPrintHelp(Options optsHelp, Options optsNormal, Options optsPDFtk) {
-      // TODO More helpful help
+      // Some general stuff
+      System.out.println("Imports or Exports Bookmarks from a PDF file");
+      System.out.println();
+      
+      // Output the normal help
       HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp("PDFtkBox", optsNormal);
-      // TODO Nobble output for pdftk
-      formatter.printHelp("PDFtkBox", optsPDFtk);
-      formatter.printHelp("PDFtkBox", optsHelp);
+      formatter.printHelp("PDFtkBox", optsNormal, true);
+      System.out.println();
+      
+      // Output the PDFtk-style help
+      formatter.setOptPrefix("");
+      formatter.printHelp("PDFtkBox", optsPDFtk, true);
+      
+      // Ignore the opts help
    }
    
    protected static void doExport(String pdf, String bookmarks, String[] args) throws IOException {
