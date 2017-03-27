@@ -3,6 +3,10 @@ plugins {
     id "com.github.johnrengelman.shadow" version "1.2.3"
 }
 
+// What we are
+def pkg = 'com.quanticate.opensource.pdftkbox'
+def ver = "0.1"
+
 // Powered by Apache PDFBox and Commons CLI
 apply plugin:'java'
 repositories {
@@ -18,7 +22,8 @@ shadowJar {
     def program = 'PDFtkBox'
     manifest {
       attributes 'Implementation-Title': 'PDFtkBox',
-                 'Main-Class': 'com.quanticate.opensource.pdftkbox.'+program
+                 'Implementation-Version': ver,
+                 'Main-Class': pkg+"."+program
     }
     classifier = ''
     baseName = program
