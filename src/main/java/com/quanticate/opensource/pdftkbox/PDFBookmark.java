@@ -62,6 +62,7 @@ public class PDFBookmark {
     *  the calling class to manage
     */
    public PDFBookmark(PDOutlineItem current, int level) throws IOException {
+      this.title = current.getTitle();
       this.outlineItem = current;
       this.level = level;
       
@@ -84,8 +85,6 @@ public class PDFBookmark {
       }
 
       if (dest != null) {
-         this.title = current.getTitle();
-
          if (dest instanceof PDPageDestination) {
             PDPageDestination pdest = (PDPageDestination)dest;
             int pageNum = pdest.retrievePageNumber();
