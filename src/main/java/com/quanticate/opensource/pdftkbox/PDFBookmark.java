@@ -122,7 +122,7 @@ public class PDFBookmark {
             zoom = zoomType.name();
          }
       } else {
-         System.err.println("Warning - Non-destination bookmark " + current);
+         System.err.println("Warning - Non-destination bookmark " + current + " with action " + current.getAction());
       }
    }
    
