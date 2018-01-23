@@ -45,7 +45,8 @@ one of:
  * `java -jar PDFtkBox.jar <input.pdf> update_info - <output.pdf>`
 
 To import the bookmarks, from a text file, saving as a new file, use one of:
- * `java -jar PDFtkBox.jar -import <input.pdf> -bookmarks <bookmarks.txt> -export <output.pdf>`
+ * `java -jar PDFtkBox.jar -import <input.pdf> -bookmarks <bookmarks.txt> <output.pdf>`
+ * `java -jar PDFtkBox.jar -import <input.pdf> -bookmarks <bookmarks.txt> -output <output.pdf>`
  * `java -jar PDFtkBox.jar <input.pdf> update_info <bookmarks.txt> output <output.pdf>`
 
 Bookmark Definition

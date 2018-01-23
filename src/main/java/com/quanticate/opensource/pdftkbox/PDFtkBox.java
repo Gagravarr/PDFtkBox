@@ -54,14 +54,14 @@ public class PDFtkBox {
             .required()
             .hasArg()
             .desc("export bookmarks from pdf" )
-            .argName("pdf").build();
+            .argName("source-pdf").build();
       normal.addOption(optExport);
       Option optImport = 
             Option.builder("import")
             .required()
             .hasArg()
-            .desc("import bookmarks to pdf" )
-            .argName("pdf").build();
+            .desc("import bookmarks into pdf" )
+            .argName("source-pdf").build();
       normal.addOption(optImport);
       optsNormal.addOptionGroup(normal);
       Option optBookmarks = 
@@ -70,6 +70,12 @@ public class PDFtkBox {
             .desc("bookmarks definition file" )
             .argName("bookmarks").build();
       optsNormal.addOption(optBookmarks);
+      Option optOutput = 
+            Option.builder("output")
+            .hasArg()
+            .desc("output to new pdf" )
+            .argName("pdf").build();
+      optsNormal.addOption(optOutput);
       
       // PDFtk style options
       Options optsPDFtk = new Options();
@@ -88,11 +94,6 @@ public class PDFtkBox {
             .argName("bookmarks").build();
       pdftk.addOption(optUpdateInfo);
       optsPDFtk.addOptionGroup(pdftk);
-      Option optOutput = 
-            Option.builder("output")
-            .hasArg()
-            .desc("output to file" )
-            .argName("file").build();
       optsPDFtk.addOption(optOutput);
 
       
@@ -114,12 +115,23 @@ public class PDFtkBox {
       try {
          CommandLine line = parser.parse(optsNormal, args);
          
+         // Export
          if (line.hasOption(optExport.getOpt())) {
             doExport( line.getOptionValue(optExport.getOpt()), 
                       line.getOptionValue(optBookmarks.getOpt()), 
                       line.getArgs() );
             return;
          }
+         // Import with explicit output filename
+         if (line.hasOption(optImport.getOpt()) && 
+             line.hasOption(optOutput.getOpt())) {
+            doImport( line.getOptionValue(optImport.getOpt()),
+                      line.getOptionValue(optBookmarks.getOpt()), 
+                      line.getOptionValue(optOutput.getOpt()), 
+                      null );
+            return;
+         }
+         // Import with implicit output filename
          if (line.hasOption(optImport.getOpt()) && line.getArgs().length > 0) {
             doImport( line.getOptionValue(optImport.getOpt()),
                       line.getOptionValue(optBookmarks.getOpt()), 
